@@ -14,11 +14,14 @@ import inbox.store.query
 import inbox.store.str
 import inbox.store.update
 import io.micrometer.core.instrument.MeterRegistry
+import jakarta.annotation.PreDestroy
 import jakarta.enterprise.context.ApplicationScoped
 import java.time.Clock
 import java.time.Duration
 import java.time.Instant
 import java.util.concurrent.ConcurrentHashMap
+import java.util.concurrent.ExecutorService
+import java.util.concurrent.Executors
 
 /**
  * Drains the outbox: sends queued messages within the provider's limits.
@@ -30,12 +33,20 @@ import java.util.concurrent.ConcurrentHashMap
  * * Ambiguous sends (timeout, broken connection) are not retried at once. The status webhook of
  *   that message, matched by its callback data, settles it; only after
  *   [InboxConfig.Sender.ambiguousWait] of silence is it sent again.
+ * * Different customers are sent in parallel ([InboxConfig.Sender.concurrency]); one customer's
+ *   messages in order.
  * * Each business number is sent by exactly one instance (`hashtext(account) % instances`), so the
  *   bucket can live in memory without two instances spending the same budget.
  */
 @ApplicationScoped
 class Sender(private val db: Db, private val cfg: InboxConfig, private val providers: Providers, private val clock: Clock, private val meters: MeterRegistry) {
     private val buckets = ConcurrentHashMap<String, TokenBucket>()
+    private val pool: ExecutorService = Executors.newFixedThreadPool(cfg.sender().concurrency()) { r -> Thread(r, "inbox-sender").apply { isDaemon = true } }
+
+    @PreDestroy
+    fun stop() {
+        pool.shutdownNow()
+    }
 
     data class Job(
         val messageId: String,
@@ -95,8 +106,14 @@ class Sender(private val db: Db, private val cfg: InboxConfig, private val provi
         var rescheduled = 0
         var failed = 0
         var ambiguous = 0
-        for (j in jobs) {
-            when (process(j)) {
+        // Customers in parallel, each customer's messages in order: one slow send must not hold up
+        // the number's whole budget, and two sends to one customer must not race the pair limit.
+        val outcomes =
+            jobs.groupBy { it.recipient }.values
+                .map { mine -> pool.submit<List<String>> { mine.map { process(it) } } }
+                .flatMap { it.get() }
+        for (o in outcomes) {
+            when (o) {
                 "sent" -> sent++
                 "failed" -> failed++
                 "ambiguous" -> ambiguous++
@@ -156,11 +173,12 @@ class Sender(private val db: Db, private val cfg: InboxConfig, private val provi
             reschedule(j, nextAllowed, "pair_spacing", false)
             return "rescheduled"
         }
-        // burst + one second of refill = the provider's limit, in any sliding second
+        // burst + one second of refill = our share of the provider's limit, in any sliding second
         val bucket =
             buckets.computeIfAbsent(j.accountId) {
-                val burst = maxOf(1.0, j.throughput * s.burstShare())
-                TokenBucket(j.throughput - burst, burst)
+                val budget = j.throughput * (1 - s.headroom())
+                val burst = maxOf(1.0, budget * s.burstShare())
+                TokenBucket(budget - burst, burst)
             }
         val taken = synchronized(bucket) { bucket.tryTake(now) }
         if (!taken) {

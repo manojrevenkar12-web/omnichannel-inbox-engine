@@ -77,6 +77,12 @@ interface InboxConfig {
          * second, so burst plus one second of refill must stay within the limit.
          */
         fun burstShare(): Double
+
+        /** Share of the provider's limit left unused, for clock and network jitter between us and its counter. */
+        fun headroom(): Double
+
+        /** Sends in flight at once per instance, to different customers. */
+        fun concurrency(): Int
     }
 
     interface Agent {
