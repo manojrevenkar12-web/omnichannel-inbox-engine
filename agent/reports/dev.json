@@ -1,17 +1,17 @@
 {
   "turns": 36,
-  "right_action": 0.9444,
+  "right_action": 0.9722,
   "handoff_recall": 1.0,
   "replied_when_a_person_was_needed": 0,
-  "answered_when_answerable": 0.913,
+  "answered_when_answerable": 0.9565,
   "right_knowledge_when_answered": 1.0,
   "right_language_when_answered": 1.0,
   "unsupported_claims_sent": 0,
-  "messages_sent": 21,
+  "messages_sent": 22,
   "messages_a_per_fragment_bot_sends": 41,
   "actions": {
-    "reply": 21,
-    "handoff": 13,
+    "reply": 22,
+    "handoff": 12,
     "no_reply": 2
   },
   "handoff_recall_by_why": {
@@ -446,15 +446,15 @@
     {
       "id": "d36",
       "expect": "reply",
-      "action": "handoff",
-      "reason": "only partly covered by booking: can I come in tomorrow at 10?",
-      "right_action": false,
+      "action": "reply",
+      "reason": "answered from booking",
+      "right_action": true,
       "right_entries": true,
       "lang_right": true,
       "unsupported": [],
       "fragments": 1,
-      "messages_sent": 0
+      "messages_sent": 1
     }
   ],
-  "headline": "36 turns: right action 94.4%, handoff recall 100.0% (replied when a person was needed: 0), answered 91.3% of answerable turns, unsupported claims sent 0; 21 messages instead of 41 for a per-fragment bot."
+  "headline": "36 turns: right action 97.2%, handoff recall 100.0% (replied when a person was needed: 0), answered 95.7% of answerable turns, unsupported claims sent 0; 22 messages instead of 41 for a per-fragment bot."
 }

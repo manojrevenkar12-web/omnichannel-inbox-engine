@@ -2,7 +2,7 @@ business: Nordlicht Bikes
 languages: [en, de]
 entries:
   - id: opening-hours
-    keywords: [open, opening, hours, closed, saturday, geöffnet, öffnungszeiten, samstag, wann]
+    keywords: [open, opening, hours, closed, close, monday, tuesday, wednesday, thursday, friday, saturday, sunday, geöffnet, öffnungszeiten, offen, geschlossen, montag, dienstag, mittwoch, donnerstag, freitag, samstag, sonntag, wann]
     en: "The shop is open Tuesday to Saturday from 10:00 to 19:00."
     de: "Der Laden ist Dienstag bis Samstag von 10:00 bis 19:00 Uhr geöffnet."
   - id: repair

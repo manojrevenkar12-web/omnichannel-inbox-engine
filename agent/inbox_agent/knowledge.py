@@ -39,6 +39,22 @@ class Knowledge:
         for d in self._docs:
             self._df.update(set(d))
         self._avg = sum(len(d) for d in self._docs) / max(len(self._docs), 1)
+        self._vocab = set(self._df)
+
+    def canonical(self, tok: str) -> str:
+        """Map a word the knowledge does not contain to one it does when they share a long stem.
+
+        German inflects verbs and nouns more than a suffix strip can follow ("liefert", "liefern",
+        "Lieferung"; "Kassenpatient", "Kassenpatienten"). Five shared letters and at most three
+        letters of difference count as the same word.
+        """
+        if tok in self._vocab or len(tok) < 5:
+            return tok
+        best = [v for v in self._vocab if len(v) >= 5 and abs(len(v) - len(tok)) <= 3 and (v.startswith(tok) or tok.startswith(v))]
+        return min(best, key=lambda v: (abs(len(v) - len(tok)), v)) if best else tok
+
+    def terms(self, text: str) -> list[str]:
+        return [self.canonical(stem(t)) for t in search_tokens(text)]
 
     @staticmethod
     def _doc(e: Entry) -> list[str]:
@@ -58,7 +74,7 @@ class Knowledge:
         return cls(raw.get("business", workspace), entries)
 
     def search(self, query: str, k: int = 3) -> list[Hit]:
-        q = [stem(t) for t in search_tokens(query)]
+        q = self.terms(query)
         n = len(self._docs)
         hits = []
         for e, d, keys in zip(self.entries, self._docs, self._keys, strict=True):
@@ -71,7 +87,8 @@ class Knowledge:
                 s += idf * tf[t] * 2.2 / (tf[t] + 1.2 * (0.25 + 0.75 * len(d) / self._avg))
             if s > 0:
                 qs = set(q)
-                hits.append(Hit(e, s, bool(keys & qs), len(qs & tf.keys()) / len(qs)))
+                topical = {t for t in qs if not t.isdigit()} or qs  # "my son is 4": the 4 is a fact, not a topic
+                hits.append(Hit(e, s, bool(keys & qs), len(topical & tf.keys()) / len(topical)))
         return sorted(hits, key=lambda h: -h.score)[:k]
 
     def entry(self, id: str) -> Entry | None:

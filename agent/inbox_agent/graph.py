@@ -20,14 +20,37 @@ from langgraph.graph import END, START, StateGraph
 from inbox_agent import rules
 from inbox_agent.knowledge import Entry, Knowledge
 from inbox_agent.model import GREETING, Drafter, default_drafter
-from inbox_agent.text import is_question, language, sentences
+from inbox_agent.text import is_question, language, search_tokens, sentences
 from inbox_agent.verify import unsupported
 
 # An entry answers a question only if the question uses one of the entry's keywords and the entry
-# knows at least half of the question's words: BM25 alone finds a "best" entry for any text,
+# knows almost a third of the question's topic words: BM25 alone finds a "best" entry for any text,
 # including "do you do root canals on Sundays?", which shares one word with the opening hours.
-MIN_COVERAGE = 0.5
+MIN_COVERAGE = 0.3
 MIN_MARGIN = 1.15  # the best entry must beat the second by this factor, or the question is ambiguous
+# What kind of fact a question asks for, and what an answer of that kind contains. An entry that
+# matches the topic but not the kind ("how much is a check-up if I'm private?" against "a check-up
+# is covered twice a year") does not answer the question.
+ASKS = [
+    (
+        re.compile(r"\b(how much|price|prices|cost|costs|kostet|kosten|preis|preise|wie ?viel|what do you charge)\b", re.I),
+        re.compile(r"\d+\s?(eur|€)", re.I),
+    ),
+    (
+        re.compile(
+            r"\b(\d{1,2}(st|nd|rd|th)\b|\d{1,2}\.\d{1,2}\.|january|february|march|april|june|july|august|september|october|"
+            r"november|december|januar|februar|märz|juni|juli|oktober|dezember|christmas|weihnacht\w*|silvester|new year|easter|"
+            r"ostern|holidays?|feiertag\w*|urlaub|vacation|betriebsferien)",
+            re.I,
+        ),
+        re.compile(r"holiday|feiertag|christmas|weihnacht|december|dezember|urlaub|ferien", re.I),
+    ),
+    (
+        re.compile(r"\b(how long|wie lange|dauert|dauer)\b", re.I),
+        re.compile(r"\d+\s?(min|minutes|minuten|hours|stunden|days|tage|werktage|working days)|\bdays\b|\btage\b", re.I),
+    ),
+]
+FOLLOW_UP_WORDS = {"long", "take", "kost", "kostet", "cost", "dauert", "dauer", "lange", "preis", "price"}
 CLAUSE = re.compile(r"(\band\b|\bund\b|\balso\b|\baußerdem\b|\bplus\b|,)", re.I)
 
 
@@ -75,8 +98,12 @@ def build(drafter: Drafter | None = None, knowledge: dict[str, Knowledge] | None
     def after_gate(s: State) -> str:
         return END if s.get("action") else "retrieve"
 
+    def answers_kind(q: str, e: Entry) -> bool:
+        text = " ".join(e.text.values())
+        return all(has.search(text) for asks, has in ASKS if asks.search(q))
+
     def confident(ws: str, q: str) -> tuple[Entry, float] | None:
-        hits = [h for h in kb(ws).search(q, k=5) if h.keyword_match]
+        hits = [h for h in kb(ws).search(q, k=5) if h.keyword_match and answers_kind(q, h.entry)]
         if not hits or hits[0].coverage < MIN_COVERAGE:
             return None
         if len(hits) > 1 and hits[0].score < MIN_MARGIN * hits[1].score:
@@ -91,6 +118,7 @@ def build(drafter: Drafter | None = None, knowledge: dict[str, Knowledge] | None
         customer's other question unanswered.
         """
         parts = [p.strip(" ,?") for p in CLAUSE.split(q) if p and p.strip(" ,?") and not CLAUSE.fullmatch(p.strip())]
+        parts = [p for p in parts if search_tokens(p)]  # "Guten Tag," is not a question
         if len(parts) > 1:
             found = [confident(ws, part) for part in parts]
             distinct = {f[0].id for f in found if f}
@@ -102,9 +130,22 @@ def build(drafter: Drafter | None = None, knowledge: dict[str, Knowledge] | None
         hits = [h for h in kb(ws).search(q, k=5) if h.keyword_match]
         if not hits:
             return f"not in the knowledge: {q[:80]}"
+        if not any(answers_kind(q, h.entry) for h in hits):
+            return f"{hits[0].entry.id} does not give what is asked: {q[:80]}"
         if len(hits) == 1 or hits[0].coverage < MIN_COVERAGE:
             return f"only partly covered by {hits[0].entry.id}: {q[:80]}"
         return f"ambiguous between {hits[0].entry.id} and {hits[1].entry.id}"
+
+    def follows_up(k: Knowledge, q: str, found: list[Entry]) -> bool:
+        """A question with no topic of its own that the entries already found answer in full."""
+        if any(h.keyword_match for h in k.search(q, k=5)):
+            return False  # it names a topic of its own
+        known: set[str] = set()
+        for e in found:
+            for t in e.text.values():
+                known |= set(k.terms(t))
+        words = set(k.terms(q)) - FOLLOW_UP_WORDS
+        return words <= known and all(answers_kind(q, e) for e in found[-1:])
 
     def retrieve(state: State) -> State:  # LangGraph passes the state as `state`
 
@@ -112,7 +153,11 @@ def build(drafter: Drafter | None = None, knowledge: dict[str, Knowledge] | None
         questions = [q for q in sentences(s["turn"]) if is_question(q)] or [s["turn"]]
         found: list[Entry] = []
         scores: list[float] = []
+        k = kb(s["workspace"])
         for q in questions:
+            r = answer_for(s["workspace"], q)
+            if isinstance(r, str) and found and follows_up(k, q, found):
+                continue  # "and how long does it take?", "which floor?": about what was just asked
             r = answer_for(s["workspace"], q)
             if isinstance(r, str):
                 return {"questions": questions, "action": "handoff", "reason": r, "confidence": 0.8}

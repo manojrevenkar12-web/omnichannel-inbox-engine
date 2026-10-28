@@ -4,7 +4,7 @@ business: Praxis Dr. Lindqvist
 languages: [en, de]
 entries:
   - id: opening-hours
-    keywords: [open, opening, hours, closed, weekend, saturday, sunday, friday, geöffnet, öffnungszeiten, offen, geschlossen, samstag, sonntag, freitag, wann]
+    keywords: [open, opening, hours, closed, close, weekend, monday, tuesday, wednesday, thursday, friday, saturday, sunday, geöffnet, öffnungszeiten, offen, geschlossen, wochenende, montag, dienstag, mittwoch, donnerstag, freitag, samstag, sonntag, wann]
     en: "We are open Monday to Thursday 8:00 to 18:00 and Friday 8:00 to 14:00. We are closed at weekends."
     de: "Wir haben Montag bis Donnerstag von 8:00 bis 18:00 Uhr und Freitag von 8:00 bis 14:00 Uhr geöffnet. Am Wochenende ist die Praxis geschlossen."
   - id: booking
@@ -44,7 +44,7 @@ entries:
     en: "You can pay by debit or credit card. Private patients receive an invoice."
     de: "Sie können mit EC- oder Kreditkarte zahlen. Privatpatienten erhalten eine Rechnung."
   - id: accessibility
-    keywords: [wheelchair, accessible, stairs, lift, elevator, step-free, rollstuhl, barrierefrei, aufzug, treppe]
+    keywords: [wheelchair, accessible, accessibility, stairs, step, steps, step-free, lift, elevator, pram, buggy, stroller, rollstuhl, barrierefrei, aufzug, treppe, stufe, stufen, kinderwagen, rollator]
     en: "The practice has a step-free entrance and a lift."
     de: "Die Praxis hat einen stufenlosen Eingang und einen Aufzug."
   - id: address
