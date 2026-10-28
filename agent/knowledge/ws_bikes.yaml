@@ -1,0 +1,15 @@
+business: Nordlicht Bikes
+languages: [en, de]
+entries:
+  - id: opening-hours
+    keywords: [open, opening, hours, closed, saturday, geöffnet, öffnungszeiten, samstag, wann]
+    en: "The shop is open Tuesday to Saturday from 10:00 to 19:00."
+    de: "Der Laden ist Dienstag bis Samstag von 10:00 bis 19:00 Uhr geöffnet."
+  - id: repair
+    keywords: [repair, service, inspection, fix, broken, reparatur, inspektion, kaputt, wartung]
+    en: "A standard inspection costs 79 EUR. Repairs usually take 3 to 5 working days."
+    de: "Eine Standardinspektion kostet 79 EUR. Reparaturen dauern meist 3 bis 5 Werktage."
+  - id: delivery
+    keywords: [delivery, deliver, shipping, ship, lieferung, liefern, versand]
+    en: "We deliver new bikes within Hamburg for 29 EUR."
+    de: "Neue Räder liefern wir innerhalb Hamburgs für 29 EUR."

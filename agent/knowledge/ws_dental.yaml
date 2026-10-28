@@ -1,0 +1,57 @@
+# Knowledge for the AI agent of Praxis Dr. Lindqvist (fictional). The agent answers only from
+# these entries; anything else goes to a person.
+business: Praxis Dr. Lindqvist
+languages: [en, de]
+entries:
+  - id: opening-hours
+    keywords: [open, opening, hours, closed, weekend, saturday, sunday, friday, geöffnet, öffnungszeiten, offen, geschlossen, samstag, sonntag, freitag, wann]
+    en: "We are open Monday to Thursday 8:00 to 18:00 and Friday 8:00 to 14:00. We are closed at weekends."
+    de: "Wir haben Montag bis Donnerstag von 8:00 bis 18:00 Uhr und Freitag von 8:00 bis 14:00 Uhr geöffnet. Am Wochenende ist die Praxis geschlossen."
+  - id: booking
+    keywords: [appointment, book, booking, slot, schedule, reschedule, move, come, visit, termin, buchen, vereinbaren, verschieben, verlegen]
+    en: "You can book or move an appointment online at booking.lindqvist-dental.example or by phone on +49 30 5550 1000. I cannot book appointments in this chat."
+    de: "Termine buchen oder verschieben Sie online unter booking.lindqvist-dental.example oder telefonisch unter +49 30 5550 1000. Im Chat kann ich keine Termine buchen."
+  - id: cancellation
+    keywords: [cancel, cancellation, miss, missed, no-show, fee, absagen, stornieren, ausfall, ausfallgebühr, verpasst]
+    en: "Please cancel at least 24 hours before your appointment. For appointments missed without notice we may charge 40 EUR."
+    de: "Bitte sagen Sie Termine mindestens 24 Stunden vorher ab. Für nicht abgesagte Termine können wir 40 EUR berechnen."
+  - id: insurance
+    keywords: [insurance, insured, public, private, statutory, kasse, krankenkasse, kassenpatient, privatpatient, gesetzlich, privat, versichert, versicherung, aok, tk, barmer]
+    en: "We treat patients with public (statutory) and private insurance."
+    de: "Wir behandeln gesetzlich und privat versicherte Patientinnen und Patienten."
+  - id: cleaning
+    keywords: [cleaning, clean, hygiene, pzr, prophylaxis, tartar, reinigung, zahnreinigung, prophylaxe, zahnstein]
+    en: "A professional cleaning costs 95 EUR and takes about 60 minutes. Public insurance usually does not cover it, but some insurers reimburse part of it."
+    de: "Eine professionelle Zahnreinigung kostet 95 EUR und dauert etwa 60 Minuten. Gesetzliche Kassen übernehmen sie meist nicht, manche erstatten einen Teil."
+  - id: checkup
+    keywords: [checkup, check-up, check, control, examination, kontrolle, vorsorge, untersuchung]
+    en: "With public insurance a check-up is covered twice a year."
+    de: "Mit gesetzlicher Versicherung ist die Kontrolluntersuchung zweimal im Jahr abgedeckt."
+  - id: whitening
+    keywords: [whitening, bleaching, white, aufhellen, bleaching, weiß, weisser]
+    en: "In-office whitening costs 350 EUR. A consultation first checks whether it suits your teeth."
+    de: "Ein Bleaching in der Praxis kostet 350 EUR. Vorher prüfen wir in einer Beratung, ob es für Ihre Zähne geeignet ist."
+  - id: children
+    keywords: [child, children, kid, kids, son, daughter, baby, kind, kinder, sohn, tochter]
+    en: "We treat children from the age of 3."
+    de: "Wir behandeln Kinder ab 3 Jahren."
+  - id: languages
+    keywords: [english, german, swedish, language, speak, englisch, deutsch, schwedisch, sprache, sprechen]
+    en: "Our team speaks German, English and Swedish."
+    de: "Unser Team spricht Deutsch, Englisch und Schwedisch."
+  - id: payment
+    keywords: [pay, payment, card, cash, invoice, bill, zahlen, bezahlen, karte, ec, rechnung, bar]
+    en: "You can pay by debit or credit card. Private patients receive an invoice."
+    de: "Sie können mit EC- oder Kreditkarte zahlen. Privatpatienten erhalten eine Rechnung."
+  - id: accessibility
+    keywords: [wheelchair, accessible, stairs, lift, elevator, step-free, rollstuhl, barrierefrei, aufzug, treppe]
+    en: "The practice has a step-free entrance and a lift."
+    de: "Die Praxis hat einen stufenlosen Eingang und einen Aufzug."
+  - id: address
+    keywords: [address, where, location, located, find, directions, adresse, wo, anfahrt, finden, finde, liegt]
+    en: "We are at Beispielstraße 12, 10437 Berlin, on the first floor."
+    de: "Sie finden uns in der Beispielstraße 12, 10437 Berlin, im ersten Stock."
+  - id: emergency
+    keywords: [emergency, urgent, notfall, dringend]
+    en: "If you have heavy bleeding or swelling that affects breathing or swallowing, call 112 now."
+    de: "Bei starker Blutung oder einer Schwellung, die Atmen oder Schlucken erschwert, rufen Sie sofort die 112."

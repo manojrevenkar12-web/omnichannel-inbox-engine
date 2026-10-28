@@ -1,0 +1,36 @@
+[build-system]
+requires = ["setuptools>=69"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "inbox-agent"
+version = "0.1.0"
+description = "The LangGraph agent behind the inbox: answers from the business's knowledge or hands over to a person."
+requires-python = ">=3.11"
+dependencies = ["langgraph>=1.0", "fastapi>=0.115", "uvicorn>=0.30", "pydantic>=2.7", "pyyaml>=6", "httpx>=0.27"]
+
+[project.optional-dependencies]
+dev = ["pytest>=8", "ruff==0.17.3", "mypy>=1.10", "types-PyYAML"]
+
+[project.scripts]
+inbox-agent = "inbox_agent.cli:main"
+
+[tool.setuptools.packages.find]
+include = ["inbox_agent*"]
+
+[tool.ruff]
+line-length = 140
+target-version = "py311"
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "B", "UP", "SIM", "RUF"]
+ignore = ["RUF001", "RUF002", "RUF003", "E501"]  # the formatter owns line length
+
+[tool.mypy]
+python_version = "3.11"
+packages = ["inbox_agent"]
+ignore_missing_imports = true
+check_untyped_defs = true
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
