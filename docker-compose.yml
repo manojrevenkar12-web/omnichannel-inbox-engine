@@ -1,0 +1,22 @@
+# Everything on one machine: PostgreSQL, the core, the agent and the console.
+# WhatsApp sends go to the real Graph API unless WHATSAPP_GRAPH_URL points elsewhere.
+services:
+  db:
+    image: postgres:16
+    environment: { POSTGRES_USER: inbox, POSTGRES_PASSWORD: inbox, POSTGRES_DB: inbox }
+    healthcheck: { test: ["CMD", "pg_isready", "-U", "inbox"], interval: 2s, retries: 30 }
+  agent:
+    build: ./agent
+  core:
+    build: ./core
+    depends_on: { db: { condition: service_healthy }, agent: { condition: service_started } }
+    environment:
+      DATABASE_URL: jdbc:postgresql://db:5432/inbox
+      AGENT_URL: http://agent:8090
+      DEMO_SEED: "true"
+      CONSOLE_ORIGIN: http://localhost:8081
+    ports: ["8080:8080"]
+  web:
+    build: ./web
+    depends_on: [core]
+    ports: ["8081:8080"]

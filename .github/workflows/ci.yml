@@ -49,9 +49,9 @@ jobs:
         with:
           python-version: "3.13"
       - run: pip install -e ".[dev]"
-      - run: ruff check . && ruff format --check .
-      - run: mypy
-      - run: pytest -q
+      - run: ../scripts/annotate_on_failure.sh "ruff" sh -c "ruff check . && ruff format --check ."
+      - run: ../scripts/annotate_on_failure.sh "mypy" mypy
+      - run: ../scripts/annotate_on_failure.sh "pytest" pytest -q
       - name: Development set (in-sample)
         run: |
           inbox-agent eval dev > dev.out
@@ -59,7 +59,8 @@ jobs:
       - name: Blind first runs
         run: |
           for f in reports/heldout/*/first_run.json; do
-            python3 -c "import json,sys;d=json.load(open(sys.argv[1]));print(f'::notice title=agent {d[\"set\"]} ({d[\"status\"]}) first run::'+d['headline'])" "$f"
+            set=$(basename "$(dirname "$f")")
+            python3 -c "import json,sys;d=json.load(open(sys.argv[1]));print(f'::notice title=agent {sys.argv[2]}, first run (set now {sys.argv[3]})::'+d['headline'])" "$f" "$set" "$(cat heldout/$set/STATUS)"
           done
 
   web:
@@ -76,8 +77,8 @@ jobs:
           cache: npm
           cache-dependency-path: web/package-lock.json
       - run: npm ci
-      - run: npm run typecheck
-      - run: npm test
+      - run: ../scripts/annotate_on_failure.sh "typecheck" npm run typecheck
+      - run: ../scripts/annotate_on_failure.sh "unit tests" npm test
       - run: npm run build
 
   e2e:
@@ -123,7 +124,7 @@ jobs:
           nohup node web/e2e/fake-graph.mjs > fake-graph.log 2>&1 &
           nohup java -jar core/build/quarkus-app/quarkus-run.jar > core.log 2>&1 &
           for i in $(seq 1 60); do curl -sf localhost:8080/q/health/ready >/dev/null && curl -sf localhost:8090/healthz >/dev/null && exit 0; sleep 2; done
-          cat core.log agent.log; exit 1
+          scripts/annotate_on_failure.sh "core did not start" sh -c "tail -60 core.log; tail -20 agent.log; exit 1"
       - name: Playwright
         working-directory: web
         run: |
@@ -145,3 +146,19 @@ jobs:
             web/test-results
             core.log
             agent.log
+
+  infra:
+    name: infrastructure (Terraform fmt, validate, plan tests)
+    runs-on: ubuntu-24.04
+    defaults:
+      run:
+        working-directory: infra/terraform
+    steps:
+      - uses: actions/checkout@v5
+      - uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: 1.9.8
+      - run: ../../scripts/annotate_on_failure.sh "terraform fmt" terraform fmt -check -recursive -diff
+      - run: ../../scripts/annotate_on_failure.sh "terraform init" terraform init -backend=false -input=false
+      - run: ../../scripts/annotate_on_failure.sh "terraform validate" terraform validate -no-color
+      - run: ../../scripts/annotate_on_failure.sh "terraform test" terraform test -no-color
