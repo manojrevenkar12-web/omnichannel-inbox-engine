@@ -1,7 +1,6 @@
 package inbox.it
 
 import com.fasterxml.jackson.databind.ObjectMapper
-import inbox.agent.AgentClient
 import inbox.service.Agents
 import inbox.service.EventProcessor
 import inbox.service.Sender
@@ -9,7 +8,6 @@ import inbox.store.Db
 import inbox.store.one
 import inbox.store.query
 import io.quarkus.test.common.QuarkusTestResource
-import io.quarkus.test.junit.QuarkusMock
 import io.quarkus.test.junit.QuarkusTest
 import io.restassured.RestAssured.given
 import jakarta.inject.Inject
@@ -35,6 +33,8 @@ class InboxFlowTest {
 
     @Inject lateinit var agents: Agents
 
+    @Inject lateinit var testAgent: TestAgent
+
     private lateinit var h: Harness
     private lateinit var agent: ScriptedAgent
     private val fake get() = FakeWhatsAppResource.fake
@@ -45,7 +45,7 @@ class InboxFlowTest {
         TestData.reset(db)
         fake.reset()
         agent = ScriptedAgent.faq()
-        QuarkusMock.installMockForType(agent, AgentClient::class.java)
+        testAgent.script = agent
         h = Harness(db, mapper, events, sender, agents)
     }
 

@@ -7,6 +7,9 @@ import inbox.domain.AgentDecision
 import inbox.store.Db
 import inbox.store.update
 import io.quarkus.test.common.QuarkusTestResourceLifecycleManager
+import jakarta.annotation.Priority
+import jakarta.enterprise.context.ApplicationScoped
+import jakarta.enterprise.inject.Alternative
 import java.time.Instant
 import java.util.Collections
 
@@ -24,6 +27,19 @@ class FakeWhatsAppResource : QuarkusTestResourceLifecycleManager {
     companion object {
         lateinit var fake: FakeWhatsApp
     }
+}
+
+/**
+ * Replaces the HTTP agent client in tests. Each test sets [script]; the app's [inbox.service.Agents]
+ * calls whatever script is current.
+ */
+@Alternative
+@Priority(1)
+@ApplicationScoped
+class TestAgent : AgentClient {
+    @Volatile var script: AgentClient = ScriptedAgent.faq()
+
+    override fun turn(req: TurnRequest): AgentDecision = script.turn(req)
 }
 
 /** A scripted AI agent: answers from a function of the last customer message, records every turn. */
