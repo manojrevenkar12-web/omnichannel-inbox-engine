@@ -135,7 +135,7 @@ class DrillTest {
                 seed = 23,
             ),
         )
-        val customers = List(100) { TestData.waId() }
+        val customers = List(300) { TestData.waId() }
         val closed = List(10) { TestData.waId() }
         val now = Instant.now()
         val inbound =
@@ -156,10 +156,11 @@ class DrillTest {
                 ) { it.getString(1) to it.getString(2) }
             }.toMap()
 
-        // three messages to each customer at once: a burst the pair rate limit has to space out
+        // one message to each of 300 customers (a campaign the throughput limit has to pace), and
+        // three at once to a hundred of them (a burst the pair rate limit has to space out)
         val ids = mutableListOf<String>()
         for (round in 1..3) {
-            for (wa in customers) {
+            for (wa in if (round == 1) customers else customers.take(100)) {
                 val r =
                     given().header("Authorization", "Bearer demo-anna").header("Idempotency-Key", "drill-$wa-$round").contentType("application/json")
                         .body("""{"text":"Message $round about your appointment."}""").post("/api/conversations/${conv[wa]}/messages")
@@ -212,7 +213,7 @@ class DrillTest {
         report(
             "sending",
             numbers,
-            "${ids.size} messages under 3% 5xx and 3% accept-then-timeout: lost $lost, duplicates $duplicates " +
+            "${ids.size} messages to ${customers.size} customers under 3% 5xx and 3% accept-then-timeout: lost $lost, duplicates $duplicates " +
                 "(a blind retry: ${fake.acceptedLate.get()}), status mismatches $mismatches (last-write-wins: $lastWriteWinsWrong), " +
                 "peak ${fake.peakMps()}/s, 131047 rejections ${fake.rejected("131047")}, $refused closed-window sends refused before sending.",
         )
