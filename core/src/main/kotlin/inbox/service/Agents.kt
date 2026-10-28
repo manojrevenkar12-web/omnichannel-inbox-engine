@@ -14,6 +14,7 @@ import inbox.store.Db
 import inbox.store.instant
 import inbox.store.one
 import inbox.store.query
+import inbox.store.update
 import io.micrometer.core.instrument.MeterRegistry
 import jakarta.enterprise.context.ApplicationScoped
 import java.time.Clock
