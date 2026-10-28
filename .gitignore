@@ -15,3 +15,5 @@ infra/terraform/.terraform/
 *.tfstate*
 .env
 *.egg-info/
+web/playwright-report/
+web/test-results/

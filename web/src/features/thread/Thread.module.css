@@ -1,0 +1,153 @@
+.thread {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  min-width: 0;
+  background: var(--paper);
+}
+
+.back {
+  display: none;
+  align-self: flex-start;
+  margin: var(--s3) var(--s4) 0;
+  border: 0;
+  background: none;
+  padding: 0;
+  color: var(--accent);
+  cursor: pointer;
+}
+
+.head {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: var(--s3);
+  padding: var(--s4);
+  background: var(--panel);
+  border-bottom: 1px solid var(--line);
+}
+
+.who h2 {
+  font-size: var(--t-display);
+  line-height: var(--lh-tight);
+  margin: 0;
+}
+
+.who p {
+  margin: var(--s1) 0 0;
+  color: var(--ink-soft);
+}
+
+.who .reason {
+  color: var(--fuse);
+}
+
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--s2);
+  align-items: flex-start;
+}
+
+.actions button {
+  border: 1px solid var(--line);
+  border-radius: var(--radius-control);
+  background: var(--panel);
+  padding: var(--s1) var(--s3);
+  cursor: pointer;
+}
+
+.actions button:hover:not(:disabled) {
+  border-color: var(--accent);
+}
+
+.actions button:disabled {
+  opacity: 0.5;
+}
+
+.window {
+  padding: var(--s3) var(--s4);
+  background: var(--panel);
+  border-bottom: 1px solid var(--line);
+}
+
+.problem {
+  margin: var(--s2) var(--s4);
+  color: var(--danger);
+}
+
+.messages {
+  flex: 1;
+  overflow-y: auto;
+  list-style: none;
+  margin: 0;
+  padding: var(--s4);
+  display: flex;
+  flex-direction: column;
+  gap: var(--s3);
+}
+
+.message {
+  max-width: min(64ch, 80%);
+  padding: var(--s2) var(--s3);
+  border-radius: var(--radius-bubble);
+  display: grid;
+  gap: var(--s1);
+}
+
+.inbound {
+  align-self: flex-start;
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-bottom-left-radius: var(--radius-control);
+}
+
+.outbound {
+  align-self: flex-end;
+  background: var(--accent-wash);
+  border-bottom-right-radius: var(--radius-control);
+}
+
+/* the AI writes in the team's colour but its border says who wrote it */
+.ai {
+  background: var(--panel-sunk);
+  border: 1px dashed var(--accent);
+}
+
+.author {
+  font-size: var(--t-small);
+  font-weight: 700;
+}
+
+.body {
+  margin: 0;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+
+.stamp {
+  display: flex;
+  gap: var(--s3);
+  font-size: var(--t-small);
+  color: var(--ink-soft);
+}
+
+.failed {
+  color: var(--danger);
+}
+
+.facts {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--s1) var(--s4);
+  padding: var(--s2) var(--s4);
+  font-size: var(--t-small);
+  color: var(--ink-soft);
+  background: var(--panel);
+}
+
+@media (max-width: 860px) {
+  .back {
+    display: block;
+  }
+}

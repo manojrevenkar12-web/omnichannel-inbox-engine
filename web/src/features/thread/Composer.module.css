@@ -1,0 +1,77 @@
+.composer {
+  border-top: 1px solid var(--line);
+  background: var(--panel);
+  padding: var(--s3) var(--s4) var(--s4);
+}
+
+.label {
+  display: block;
+  font-size: var(--t-small);
+  color: var(--ink-soft);
+  margin-bottom: var(--s1);
+}
+
+.row {
+  display: flex;
+  gap: var(--s2);
+  align-items: flex-end;
+}
+
+.row textarea,
+.row select {
+  flex: 1;
+  min-width: 0;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-control);
+  padding: var(--s2) var(--s3);
+  background: var(--panel-sunk);
+  resize: vertical;
+}
+
+.row button {
+  border: 0;
+  border-radius: var(--radius-control);
+  padding: var(--s2) var(--s4);
+  background: var(--accent);
+  color: var(--accent-ink);
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.row button:disabled {
+  opacity: 0.5;
+  cursor: default;
+}
+
+.note {
+  margin: 0 0 var(--s2);
+  color: var(--ink-soft);
+  font-size: var(--t-small);
+  max-width: 64ch;
+}
+
+.preview {
+  margin: var(--s2) 0 0;
+  padding: var(--s2) var(--s3);
+  border-left: 3px solid var(--accent);
+  background: var(--panel-sunk);
+}
+
+.problem {
+  margin: var(--s2) 0 0;
+  color: var(--danger);
+  font-size: var(--t-small);
+}
+
+.link {
+  border: 0;
+  background: none;
+  padding: 0;
+  color: inherit;
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+.templates {
+  display: grid;
+}

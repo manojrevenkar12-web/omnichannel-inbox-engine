@@ -1,0 +1,114 @@
+.shell {
+  height: 100%;
+  display: grid;
+  grid-template-columns: var(--rail) var(--list) minmax(0, 1fr);
+}
+
+.rail {
+  display: flex;
+  flex-direction: column;
+  gap: var(--s4);
+  padding: var(--s4);
+  border-right: 1px solid var(--line);
+  min-height: 0;
+  overflow-y: auto;
+}
+
+.me {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: var(--s3);
+  margin: 0;
+}
+
+.signOut {
+  border: 0;
+  background: none;
+  padding: 0;
+  color: var(--ink-soft);
+  font-size: var(--t-small);
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+.views {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: var(--s1);
+}
+
+.views button {
+  width: 100%;
+  text-align: left;
+  border: 0;
+  border-radius: var(--radius-control);
+  background: transparent;
+  padding: var(--s2) var(--s3);
+  cursor: pointer;
+}
+
+.views button:hover {
+  background: var(--panel);
+}
+
+.views .active,
+.views .active:hover {
+  background: var(--accent);
+  color: var(--accent-ink);
+  font-weight: 700;
+}
+
+.numbers {
+  margin-top: auto;
+  padding-top: var(--s4);
+  border-top: 1px solid var(--line);
+}
+
+/* tablets: the rail becomes a row of views on top */
+@media (max-width: 1100px) {
+  .shell {
+    grid-template-columns: var(--list) minmax(0, 1fr);
+    grid-template-rows: auto minmax(0, 1fr);
+  }
+
+  .rail {
+    grid-column: 1 / -1;
+    flex-direction: row;
+    flex-wrap: wrap;
+    align-items: center;
+    border-right: 0;
+    border-bottom: 1px solid var(--line);
+    padding: var(--s2) var(--s4);
+  }
+
+  .views {
+    display: flex;
+    flex-wrap: wrap;
+  }
+
+  .numbers {
+    display: none;
+  }
+}
+
+/* phones: the list or the conversation, one at a time */
+@media (max-width: 860px) {
+  .shell {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .shell > section:last-child {
+    display: none;
+  }
+
+  .reading > section:first-of-type {
+    display: none;
+  }
+
+  .reading > section:last-child {
+    display: flex;
+  }
+}

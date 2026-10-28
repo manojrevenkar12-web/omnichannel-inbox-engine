@@ -1,0 +1,122 @@
+/*
+ * Design tokens. The palette is the colour of a practice's front desk at 8 in the morning: grey-green
+ * paper, dark ink, one deep teal for "ours", and amber only for a reply window that is running out.
+ */
+:root {
+  --paper: #eef2ef;
+  --panel: #ffffff;
+  --panel-sunk: #f6f8f6;
+  --ink: #16202a;
+  --ink-soft: #4a5761;
+  --line: #d3dbd5;
+  --accent: #0b6e5a;
+  --accent-ink: #ffffff;
+  --accent-wash: #dcefe9;
+  --fuse: #a84a0c;
+  --fuse-wash: #fbeadc;
+  --danger: #b42318;
+  --danger-wash: #fde8e6;
+  --focus: #1d5fd1;
+
+  --font: "Atkinson Hyperlegible Next", "Atkinson Hyperlegible", system-ui, sans-serif;
+  /* type scale: 13 / 15 / 18 / 24, ratio about 1.2 */
+  --t-small: 0.8125rem;
+  --t-body: 0.9375rem;
+  --t-title: 1.125rem;
+  --t-display: 1.5rem;
+  --lh-body: 1.5;
+  --lh-tight: 1.25;
+
+  /* spacing on a 4 px grid */
+  --s1: 4px;
+  --s2: 8px;
+  --s3: 12px;
+  --s4: 16px;
+  --s5: 24px;
+  --s6: 32px;
+
+  --radius-control: 6px;
+  --radius-bubble: 14px;
+  --rail: 208px;
+  --list: 360px;
+  --context: 280px;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --paper: #121a1f;
+    --panel: #18232a;
+    --panel-sunk: #1d2a32;
+    --ink: #e7eeea;
+    --ink-soft: #a5b3ad;
+    --line: #2c3b44;
+    --accent: #48c2a3;
+    --accent-ink: #08201a;
+    --accent-wash: #173a33;
+    --fuse: #f2a25c;
+    --fuse-wash: #3a2617;
+    --danger: #ff8a7f;
+    --danger-wash: #3d1d1b;
+    --focus: #8fb4ff;
+  }
+}
+
+:root[data-theme="dark"] {
+  --paper: #121a1f;
+  --panel: #18232a;
+  --panel-sunk: #1d2a32;
+  --ink: #e7eeea;
+  --ink-soft: #a5b3ad;
+  --line: #2c3b44;
+  --accent: #48c2a3;
+  --accent-ink: #08201a;
+  --accent-wash: #173a33;
+  --fuse: #f2a25c;
+  --fuse-wash: #3a2617;
+  --danger: #ff8a7f;
+  --danger-wash: #3d1d1b;
+  --focus: #8fb4ff;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body,
+#root {
+  height: 100%;
+  margin: 0;
+}
+
+body {
+  background: var(--paper);
+  color: var(--ink);
+  font-family: var(--font);
+  font-size: var(--t-body);
+  line-height: var(--lh-body);
+  font-variant-numeric: tabular-nums;
+  -webkit-font-smoothing: antialiased;
+}
+
+button,
+input,
+select,
+textarea {
+  font: inherit;
+  color: inherit;
+}
+
+:focus-visible {
+  outline: 2px solid var(--focus);
+  outline-offset: 2px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}

@@ -1,0 +1,42 @@
+.metrics {
+  margin: 0;
+  display: grid;
+  gap: var(--s2);
+  font-size: var(--t-small);
+}
+
+.metrics div {
+  display: flex;
+  justify-content: space-between;
+  gap: var(--s2);
+}
+
+.metrics dt {
+  color: var(--ink-soft);
+}
+
+.metrics dd {
+  margin: 0;
+  white-space: nowrap;
+  font-weight: 700;
+}
+
+.alert dd,
+.alert dt {
+  color: var(--fuse);
+}
+
+.quiet {
+  font-size: var(--t-small);
+  color: var(--ink-soft);
+  margin: 0;
+}
+
+.link {
+  border: 0;
+  background: none;
+  padding: 0;
+  color: inherit;
+  text-decoration: underline;
+  cursor: pointer;
+}

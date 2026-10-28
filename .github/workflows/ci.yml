@@ -61,3 +61,87 @@ jobs:
           for f in reports/heldout/*/first_run.json; do
             python3 -c "import json,sys;d=json.load(open(sys.argv[1]));print(f'::notice title=agent {d[\"set\"]} ({d[\"status\"]}) first run::'+d['headline'])" "$f"
           done
+
+  web:
+    name: web console (React, unit tests)
+    runs-on: ubuntu-24.04
+    defaults:
+      run:
+        working-directory: web
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v5
+        with:
+          node-version: "22"
+          cache: npm
+          cache-dependency-path: web/package-lock.json
+      - run: npm ci
+      - run: npm run typecheck
+      - run: npm test
+      - run: npm run build
+
+  e2e:
+    name: end to end (core + agent + console, Playwright)
+    runs-on: ubuntu-24.04
+    needs: [core, agent, web]
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_USER: inbox
+          POSTGRES_PASSWORD: inbox
+          POSTGRES_DB: inbox
+        ports: ["5432:5432"]
+        options: --health-cmd "pg_isready -U inbox" --health-interval 2s --health-timeout 2s --health-retries 30
+    env:
+      DATABASE_URL: jdbc:postgresql://localhost:5432/inbox
+      DEMO_SEED: "true"
+      AGENT_URL: http://localhost:8090
+      WHATSAPP_GRAPH_URL: http://localhost:9099
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: "21"
+      - uses: gradle/actions/setup-gradle@v4
+      - uses: actions/setup-python@v6
+        with:
+          python-version: "3.13"
+      - uses: actions/setup-node@v5
+        with:
+          node-version: "22"
+          cache: npm
+          cache-dependency-path: web/package-lock.json
+      - name: Build the core
+        working-directory: core
+        run: ./gradlew quarkusBuild -x test --no-daemon
+      - name: Start the agent, a fake WhatsApp Cloud API and the core
+        run: |
+          pip install -e agent
+          nohup inbox-agent serve --port 8090 > agent.log 2>&1 &
+          nohup node web/e2e/fake-graph.mjs > fake-graph.log 2>&1 &
+          nohup java -jar core/build/quarkus-app/quarkus-run.jar > core.log 2>&1 &
+          for i in $(seq 1 60); do curl -sf localhost:8080/q/health/ready >/dev/null && curl -sf localhost:8090/healthz >/dev/null && exit 0; sleep 2; done
+          cat core.log agent.log; exit 1
+      - name: Playwright
+        working-directory: web
+        run: |
+          npm ci
+          npx playwright install --with-deps chromium
+          npm run build
+          npx playwright test
+      - name: Annotate
+        if: always()
+        run: |
+          grep -E "ERROR|Exception" core.log | head -20 | sed 's/^/::warning title=core log::/' || true
+          grep -E "ERROR|Traceback" agent.log | head -10 | sed 's/^/::warning title=agent log::/' || true
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: e2e
+          path: |
+            web/playwright-report
+            web/test-results
+            core.log
+            agent.log

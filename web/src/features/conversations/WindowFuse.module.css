@@ -1,0 +1,47 @@
+.fuse {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  align-items: center;
+  gap: var(--s2);
+  font-size: var(--t-small);
+}
+
+.track {
+  height: 2px;
+  background: var(--line);
+  border-radius: 1px;
+  overflow: hidden;
+}
+
+.burn {
+  display: block;
+  height: 100%;
+  width: 100%;
+  transform-origin: left center;
+  background: currentColor;
+}
+
+.label {
+  white-space: nowrap;
+}
+
+.open {
+  color: var(--accent);
+}
+
+.warning {
+  color: var(--fuse);
+}
+
+.closed {
+  color: var(--ink-soft);
+}
+
+.large {
+  font-size: var(--t-body);
+}
+
+.large .track {
+  height: 4px;
+  border-radius: 2px;
+}

@@ -1,0 +1,99 @@
+.page {
+  min-height: 100%;
+  display: grid;
+  place-items: center;
+  padding: var(--s4);
+}
+
+.card {
+  width: min(440px, 100%);
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-bubble);
+  padding: var(--s6) var(--s5);
+}
+
+.title {
+  font-size: var(--t-display);
+  line-height: var(--lh-tight);
+  margin: 0 0 var(--s2);
+}
+
+.lead {
+  color: var(--ink-soft);
+  margin: 0 0 var(--s5);
+  max-width: 44ch;
+}
+
+.form {
+  display: grid;
+  gap: var(--s2);
+}
+
+.form input {
+  border: 1px solid var(--line);
+  border-radius: var(--radius-control);
+  padding: var(--s2) var(--s3);
+  background: var(--panel-sunk);
+}
+
+.form button {
+  margin-top: var(--s2);
+  border: 0;
+  border-radius: var(--radius-control);
+  padding: var(--s2) var(--s4);
+  background: var(--accent);
+  color: var(--accent-ink);
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.form button:disabled {
+  opacity: 0.55;
+  cursor: default;
+}
+
+.error {
+  color: var(--danger);
+  margin: var(--s3) 0 0;
+}
+
+.demo {
+  margin-top: var(--s5);
+  padding-top: var(--s4);
+  border-top: 1px solid var(--line);
+}
+
+.demo p {
+  margin: 0 0 var(--s2);
+  color: var(--ink-soft);
+}
+
+.demo ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: var(--s2);
+}
+
+.demo button {
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  gap: var(--s3);
+  text-align: left;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-control);
+  background: transparent;
+  padding: var(--s2) var(--s3);
+  cursor: pointer;
+}
+
+.demo button:hover {
+  border-color: var(--accent);
+}
+
+.demo span {
+  color: var(--ink-soft);
+}
