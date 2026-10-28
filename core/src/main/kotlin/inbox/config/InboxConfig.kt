@@ -71,6 +71,12 @@ interface InboxConfig {
         fun instances(): Int
 
         fun batch(): Int
+
+        /**
+         * Share of the provider's per-second limit kept as burst. The provider counts any sliding
+         * second, so burst plus one second of refill must stay within the limit.
+         */
+        fun burstShare(): Double
     }
 
     interface Agent {

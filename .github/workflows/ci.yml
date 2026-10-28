@@ -36,3 +36,28 @@ jobs:
           path: |
             core/build/reports/tests
             core/build/drills
+
+  agent:
+    name: agent (Python, LangGraph)
+    runs-on: ubuntu-24.04
+    defaults:
+      run:
+        working-directory: agent
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-python@v6
+        with:
+          python-version: "3.13"
+      - run: pip install -e ".[dev]"
+      - run: ruff check . && ruff format --check .
+      - run: mypy
+      - run: pytest -q
+      - name: Development set (in-sample)
+        run: |
+          inbox-agent eval dev > dev.out
+          python3 -c "import json;print('::notice title=agent dev set::'+json.load(open('dev.out'))['headline'])"
+      - name: Blind first runs
+        run: |
+          for f in reports/heldout/*/first_run.json; do
+            python3 -c "import json,sys;d=json.load(open(sys.argv[1]));print(f'::notice title=agent {d[\"set\"]} ({d[\"status\"]}) first run::'+d['headline'])" "$f"
+          done

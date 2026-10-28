@@ -126,6 +126,21 @@ class LimitsTest {
     }
 
     @Test
+    fun `burst plus refill never exceeds the limit in any sliding second`() {
+        val b = TokenBucket(72.0, 8.0) // the sender's split of an 80 per second limit
+        val taken = mutableListOf<Long>()
+        for (ms in 0L..5_000L) while (b.tryTake(t0 + Duration.ofMillis(ms))) taken += ms
+        var j = 0
+        var peak = 0
+        for (i in taken.indices) {
+            while (taken[i] - taken[j] >= 1000) j++
+            peak = maxOf(peak, i - j + 1)
+        }
+        assertTrue(peak <= 80, "peak $peak in one second")
+        assertTrue(taken.size >= 72 * 5, "throughput ${taken.size} in five seconds")
+    }
+
+    @Test
     fun `a throughput rejection halves the rate until the cooldown ends`() {
         val b = TokenBucket(80.0)
         b.penalise(t0, Duration.ofSeconds(10))

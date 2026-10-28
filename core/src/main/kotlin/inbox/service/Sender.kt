@@ -156,7 +156,12 @@ class Sender(private val db: Db, private val cfg: InboxConfig, private val provi
             reschedule(j, nextAllowed, "pair_spacing", false)
             return "rescheduled"
         }
-        val bucket = buckets.computeIfAbsent(j.accountId) { TokenBucket(j.throughput.toDouble()) }
+        // burst + one second of refill = the provider's limit, in any sliding second
+        val bucket =
+            buckets.computeIfAbsent(j.accountId) {
+                val burst = maxOf(1.0, j.throughput * s.burstShare())
+                TokenBucket(j.throughput - burst, burst)
+            }
         val taken = synchronized(bucket) { bucket.tryTake(now) }
         if (!taken) {
             val wait = synchronized(bucket) { bucket.waitFor(now) }
