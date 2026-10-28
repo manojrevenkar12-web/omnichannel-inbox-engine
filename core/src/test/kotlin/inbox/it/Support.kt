@@ -76,9 +76,10 @@ object TestData {
         }
     }
 
-    private var counter = 0
+    private val counter = java.util.concurrent.atomic.AtomicLong(System.currentTimeMillis() % 1_000_000 * 1_000)
 
-    fun waId(): String = "4917" + (10_000_000 + ++counter + (System.nanoTime() % 1000).toInt()).toString()
+    /** A WhatsApp id no other call in this JVM returns. */
+    fun waId(): String = "4917" + "%010d".format(counter.incrementAndGet())
 
     fun whatsappMessage(phoneNumberId: String, from: String, id: String, text: String, at: Instant, name: String? = null, adReferral: Boolean = false): Map<String, Any> {
         val msg =
