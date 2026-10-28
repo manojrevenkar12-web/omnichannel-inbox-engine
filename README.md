@@ -38,7 +38,7 @@ windows that close; and, from October 2026, a bill for every WhatsApp message.
 
 ## Measured
 
-Numbers from CI on the latest commit (the drills write `core/build/drills/*.json`; the agent's
+Numbers from CI on commit 3173523, where all five jobs pass. The sending drill's counts of what a naive client would have got wrong vary a little from run to run (12–16 duplicates, 70–103 statuses); the zeros do not (the drills write `core/build/drills/*.json`; the agent's
 first runs are pinned in `agent/reports/heldout/`).
 
 **Fault drills** against a fake WhatsApp Cloud API that fails the way the real one does:
@@ -46,7 +46,7 @@ first runs are pinned in `agent/reports/heldout/`).
 | Drill | Result |
 |---|---|
 | Inbound: 180 messages from 60 customers in 53 shuffled, batched webhooks, 8 of them delivered twice, timestamps up to 2 hours late | 0 lost, 0 duplicates, 0 windows wrong; 60 AI turns and 60 replies, not 180 |
-| Sending: 500 messages to 300 customers, 3% server errors, 3% accepted but answered too late, duplicated, reordered and early status webhooks, bursts of 3 to one customer, 10 sends to closed windows | 0 lost, 0 duplicates (a blind retry would have sent 12 in that run), 0 wrong statuses (last-write-wins would have shown 92 wrong), 0 rejections for a closed window, peak within 80 per second |
+| Sending: 500 messages to 300 customers, 3% server errors, 3% accepted but answered too late, duplicated, reordered and early status webhooks, bursts of 3 to one customer, 10 sends to closed windows | 0 lost, 0 duplicates (a blind retry would have sent 16), 0 wrong statuses (last-write-wins would have shown 87 wrong), 0 rejections for a closed window, peak within 80 per second |
 
 **The agent**, on sets nobody tuned it against. Each blind set is written by someone who has read
 only `agent/heldout/WRITING_TURNS.md`, run once, and pinned:
@@ -61,7 +61,7 @@ The turns-1 failures were studied to improve the agent (acknowledgements, role-p
 German inflection, answer-kind checks); turns-2 measures the result. Its one wrong reply and
 its handovers have not been read, so it stays honest.
 
-**Tests**: 36 Kotlin tests (domain, channel parsers, Quarkus integration with PostgreSQL, drills),
+**Tests**: 35 Kotlin tests (domain, channel parsers, Quarkus integration with PostgreSQL, drills),
 22 Python tests, 13 console unit tests, 4 Playwright end-to-end tests on the real stack, and
 Terraform plan tests with a mocked provider. All run in CI.
 
