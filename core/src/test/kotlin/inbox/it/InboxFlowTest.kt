@@ -115,7 +115,7 @@ class InboxFlowTest {
     }
 
     @Test
-    fun `a person replies with an idempotency key; after 24 hours only a template is accepted`() {
+    fun `a person replies with an idempotency key, and after 24 hours only a template is accepted`() {
         val wa = TestData.waId()
         inbound(wa, "wamid.p1", "ok", Instant.now())
         events.drain()
