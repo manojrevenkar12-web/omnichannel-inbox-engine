@@ -50,7 +50,7 @@ test("after 24 hours only an approved template can be sent", async ({ page }) =>
   await customerWrites(waId(3), contact, ["Danke!"], new Date(Date.now() - 26 * 3600_000));
   await signInAs(page, "Anna");
   await open(page, contact);
-  await expect(page.getByText("Window closed: template only")).toBeVisible();
+  await expect(page.getByLabel("Conversation").getByText("Window closed: template only")).toBeVisible();
   await page.getByLabel("Template").selectOption({ label: "follow_up (en), Utility" });
   await page.getByRole("button", { name: "Send template" }).click();
   await expect(page.getByRole("list", { name: "Messages" }).getByRole("listitem").filter({ hasText: "Template follow_up" })).toContainText(/Sent|Delivered/, { timeout: 15_000 });
