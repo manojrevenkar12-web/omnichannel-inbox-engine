@@ -81,6 +81,18 @@ class Sender(private val db: Db, private val cfg: InboxConfig, private val provi
         val now = clock.instant()
         val jobs =
             db.tx { c ->
+                // A job still IN_FLIGHT long after any send could have taken belongs to a worker that
+                // stopped mid-send. The provider may or may not have the message: treat it as ambiguous,
+                // so a status webhook can settle it before it is ever sent again.
+                c.update(
+                    "UPDATE outbound_job SET state = 'AMBIGUOUS', not_before = ?, last_error = 'worker stopped mid-send', updated_at = ? " +
+                        "WHERE state = 'IN_FLIGHT' AND updated_at < ? AND mod(abs(hashtext(account_id)::bigint), ?) = ?",
+                    now + s.ambiguousWait(),
+                    now,
+                    now - s.requestTimeout().multipliedBy(3),
+                    s.instances(),
+                    s.instance(),
+                )
                 val claimed =
                     c.query(
                         "SELECT j.message_id, j.account_id, a.address, a.throughput_mps, a.channel, j.recipient, j.state, j.attempts, " +

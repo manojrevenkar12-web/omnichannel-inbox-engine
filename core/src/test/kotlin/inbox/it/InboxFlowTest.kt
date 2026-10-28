@@ -7,6 +7,7 @@ import inbox.service.Sender
 import inbox.store.Db
 import inbox.store.one
 import inbox.store.query
+import inbox.store.update
 import io.quarkus.test.common.QuarkusTestResource
 import io.quarkus.test.junit.QuarkusTest
 import io.restassured.RestAssured.given
@@ -141,6 +142,23 @@ class InboxFlowTest {
         assertTrue(h.settle(fake, agentTurns = false))
         assertEquals(0, fake.rejected("131047"), "no free-form message reached the provider outside the window")
         assertEquals("template", fake.ledger.single { it.recipient == old }.type)
+    }
+
+    @Test
+    fun `a send left in flight by a worker that died is recovered and delivered once`() {
+        val wa = TestData.waId()
+        inbound(wa, "wamid.d1", "ok")
+        events.drain()
+        val conv = conversationOf(wa)
+        val id =
+            given().header("Authorization", "Bearer demo-anna").contentType("application/json").body("""{"text":"Your results are ready."}""")
+                .post("/api/conversations/$conv/messages").then().statusCode(202).extract().path<String>("messageId")
+        // the worker claimed it and died before the provider answered
+        db.tx { c -> c.update("UPDATE outbound_job SET state = 'IN_FLIGHT', updated_at = now() - interval '1 hour' WHERE message_id = ?", id) }
+        assertTrue(h.settle(fake, agentTurns = false))
+        assertEquals(1, fake.ledger.count { it.callbackData == id })
+        val state = db.read { c -> c.one("SELECT state FROM outbound_job WHERE message_id = ?", id) { it.getString(1) } }
+        assertEquals("DONE", state)
     }
 
     @Test
