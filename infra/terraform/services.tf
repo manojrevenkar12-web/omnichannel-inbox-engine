@@ -61,22 +61,41 @@ locals {
   # running more worker services with INBOX_SENDER_INSTANCE set, not by raising desired_count.
   containers = {
     core-api = {
-      image = var.images.core, port = 8080, cpu = 1024, memory = 2048
-      env   = concat(local.core_env, [{ name = "INBOX_WORKERS_ENABLED", value = "false" }]), secrets = local.core_secrets
+      image   = var.images.core
+      port    = 8080
+      cpu     = 1024
+      memory  = 2048
+      env     = concat(local.core_env, [{ name = "INBOX_WORKERS_ENABLED", value = "false" }])
+      secrets = local.core_secrets
     }
     core-worker = {
-      image = var.images.core, port = 8080, cpu = 1024, memory = 2048
+      image  = var.images.core
+      port   = 8080
+      cpu    = 1024
+      memory = 2048
       env = concat(local.core_env, [
         { name = "INBOX_WORKERS_ENABLED", value = "true" },
         { name = "INBOX_SENDER_INSTANCE", value = "0" },
         { name = "INBOX_SENDER_INSTANCES", value = "1" },
-      ]), secrets = local.core_secrets
+      ])
+      secrets = local.core_secrets
     }
     agent = {
-      image = var.images.agent, port = 8090, cpu = 512, memory = 1024
-      env = [], secrets = [{ name = "ANTHROPIC_API_KEY", valueFrom = aws_secretsmanager_secret.app["ANTHROPIC_API_KEY"].arn }]
+      image   = var.images.agent
+      port    = 8090
+      cpu     = 512
+      memory  = 1024
+      env     = []
+      secrets = [{ name = "ANTHROPIC_API_KEY", valueFrom = aws_secretsmanager_secret.app["ANTHROPIC_API_KEY"].arn }]
     }
-    web = { image = var.images.web, port = 8080, cpu = 256, memory = 512, env = [], secrets = [] }
+    web = {
+      image   = var.images.web
+      port    = 8080
+      cpu     = 256
+      memory  = 512
+      env     = []
+      secrets = []
+    }
   }
   desired = { core-api = var.api_tasks, core-worker = 1, agent = var.agent_tasks, web = 2 }
   # names other services reach through Service Connect

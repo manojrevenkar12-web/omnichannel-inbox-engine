@@ -12,25 +12,50 @@ locals {
   alarms = {
     # Meta retries a webhook that does not get a 200 and eventually drops it: errors here are lost customer messages
     webhook-errors = {
-      namespace = "AWS/ApplicationELB", metric = "HTTPCode_Target_5XX_Count", stat = "Sum", threshold = 5, period = 300, compare = "GreaterThanThreshold"
-      dims = { LoadBalancer = aws_lb.main.arn_suffix, TargetGroup = aws_lb_target_group.svc["core-api"].arn_suffix }
+      namespace = "AWS/ApplicationELB"
+      metric    = "HTTPCode_Target_5XX_Count"
+      stat      = "Sum"
+      threshold = 5
+      period    = 300
+      compare   = "GreaterThanThreshold"
+      dims      = { LoadBalancer = aws_lb.main.arn_suffix, TargetGroup = aws_lb_target_group.svc["core-api"].arn_suffix }
     }
     slow-webhooks = {
-      namespace = "AWS/ApplicationELB", metric = "TargetResponseTime", stat = "p95", threshold = 1, period = 300, compare = "GreaterThanThreshold"
-      dims = { LoadBalancer = aws_lb.main.arn_suffix, TargetGroup = aws_lb_target_group.svc["core-api"].arn_suffix }
+      namespace = "AWS/ApplicationELB"
+      metric    = "TargetResponseTime"
+      stat      = "p95"
+      threshold = 1
+      period    = 300
+      compare   = "GreaterThanThreshold"
+      dims      = { LoadBalancer = aws_lb.main.arn_suffix, TargetGroup = aws_lb_target_group.svc["core-api"].arn_suffix }
     }
     # no worker: nothing is sent and no AI turn runs, while webhooks still answer 200
     no-worker = {
-      namespace = "ECS/ContainerInsights", metric = "RunningTaskCount", stat = "Minimum", threshold = 1, period = 60, compare = "LessThanThreshold"
-      dims = { ClusterName = aws_ecs_cluster.main.name, ServiceName = "core-worker" }
+      namespace = "ECS/ContainerInsights"
+      metric    = "RunningTaskCount"
+      stat      = "Minimum"
+      threshold = 1
+      period    = 60
+      compare   = "LessThanThreshold"
+      dims      = { ClusterName = aws_ecs_cluster.main.name, ServiceName = "core-worker" }
     }
     db-cpu = {
-      namespace = "AWS/RDS", metric = "CPUUtilization", stat = "Average", threshold = 80, period = 300, compare = "GreaterThanThreshold"
-      dims = { DBInstanceIdentifier = aws_db_instance.main.identifier }
+      namespace = "AWS/RDS"
+      metric    = "CPUUtilization"
+      stat      = "Average"
+      threshold = 80
+      period    = 300
+      compare   = "GreaterThanThreshold"
+      dims      = { DBInstanceIdentifier = aws_db_instance.main.identifier }
     }
     db-storage = {
-      namespace = "AWS/RDS", metric = "FreeStorageSpace", stat = "Minimum", threshold = 5e9, period = 300, compare = "LessThanThreshold"
-      dims = { DBInstanceIdentifier = aws_db_instance.main.identifier }
+      namespace = "AWS/RDS"
+      metric    = "FreeStorageSpace"
+      stat      = "Minimum"
+      threshold = 5e9
+      period    = 300
+      compare   = "LessThanThreshold"
+      dims      = { DBInstanceIdentifier = aws_db_instance.main.identifier }
     }
   }
 }
