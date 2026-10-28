@@ -17,3 +17,4 @@ infra/terraform/.terraform/
 *.egg-info/
 web/playwright-report/
 web/test-results/
+*.tsbuildinfo
